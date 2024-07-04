@@ -1,0 +1,242 @@
+---
+title: "Data Wrangling in R"
+author: "Osman Can SAVRAN"
+date: "2023-11-17"
+output: html_document
+---
+
+```{=html}
+<style type="text/css">
+
+body{ /* Normal  */
+      font-size: 13.5px;
+  }
+td {  /* Table  */
+  font-size: 8px;
+}
+h1.title {
+  font-size: 38px;
+  color: DarkRed;
+}
+h1 { /* Header 1 */
+  font-size: 28px;
+  color: DarkBlue;
+  
+}
+h2 { /* Header 2 */
+    font-size: 22px;
+  color: DarkBlue;
+  text-decoration: underline;
+  
+}
+h3 { /* Header 3 */
+  font-size: 18px;
+  font-family: "Times New Roman", Times, serif;
+  color: DarkBlue;
+}
+h4 {/*Header 4*/
+ font-size: 15px;
+  font-family: "Times New Roman", Times, serif;
+  color: DarkBlue;
+
+}
+code.r{ /* Code block */
+    font-size: 12px;
+}
+pre { /* Code block - determines code spacing between lines */
+    font-size: 14px;
+}
+</style>
+```
+```{r setup,include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+## Including libraries and reading the data
+```{r Including the libraries and reading the data}
+source("Savran_OsmanCan_assignment_1.R")
+Posts <- read.csv("travel_stackexchange/Posts.csv.gz")
+Users <- read.csv("travel_stackexchange/Users.csv.gz")
+PostsLinks <- read.csv("travel_stackexchange/PostLinks.csv.gz")
+Comments <- read.csv("travel_stackexchange/Comments.csv.gz")
+library(dplyr)
+library(data.table)
+library(microbenchmark)
+library(ggplot2)
+library(compare)
+library(sqldf)
+
+```
+
+
+
+
+## Query-1
+
+The query is intended to display the top 10 non-empty user locations with the highest number of posts.
+
+### Equivalence Comparisons
+
+#### 1) SQLDF - BASE FUNCTIONS
+
+```{r sqldf1-base1 comparsion}
+compare(sqldf_1(Posts,Users),base_1(Posts,Users),allowAll = TRUE)
+```
+
+#### 2) SQLDF - DPLYR LIBRARY
+
+```{r sqldf1-dplyr1 comparsion}
+compare(sqldf_1(Posts,Users),dplyr_1(Posts,Users),allowAll = TRUE)
+```
+
+#### 3) SQLDF - DATA.TABLE LIBRARY
+
+```{r sqldf1-data.table1 comparsion}
+compare(sqldf_1(Posts,Users),data.table_1(Posts,Users),allowAll = TRUE)
+```
+
+### Comparsion of Execution Time
+
+```{r microbenchmark for QUERY1 }
+test_1<-microbenchmark(sqldf_1(Posts,Users),base_1(Posts,Users),dplyr_1(Posts,Users),data.table_1(Posts,Users),times = 40,unit = "s")
+print(test_1)
+plotbench(test_1)
+```
+
+## QUERY 2
+
+this query aims to retrieve a list of question posts along with the number of links each question post has. The list is ordered in descending order based on the count of links.
+
+### Equivalence Comparisons
+
+#### 1) SQLDF - BASE FUNCTIONS
+
+```{r sqldf2-base2 comparsion}
+compare(sqldf_2(Posts,PostsLinks),base_2(Posts,PostsLinks),allowAll = TRUE)
+```
+
+#### 2) SQLDF - DPLYR LIBRARY
+
+```{r sqldf2-dplyr2 comparsion}
+compare(sqldf_2(Posts,PostsLinks),dplyr_2(Posts,PostsLinks),allowAll = TRUE)
+```
+
+#### 3) SQLDF - DATA.TABLE LIBRARY
+
+```{r sqldf2-data.table2 comparsion}
+compare(sqldf_2(Posts,PostsLinks),data.table_2(Posts,PostsLinks),allowAll = TRUE)
+```
+
+### Comparsion of Execution Time
+
+```{r microbenchmark for QUERY2 }
+test_2<-microbenchmark(sqldf_2(Posts, PostsLinks),base_2(Posts, PostsLinks),dplyr_2(Posts, PostsLinks),data.table_2(Posts, PostsLinks),times = 40,unit = "s")
+print(test_2)
+plotbench(test_2)
+```
+
+## QUERY 3
+
+The overall intention of the query is to find and display information about the top-scoring questions (based on comments) along with details about the users who posted those questions. The query is then ordering these results by the total comment score in descending order and limiting the output to the top 10 entries.
+
+### Equivalence Comparisons
+
+#### 1) SQLDF - BASE FUNCTIONS
+
+```{r sqldf3-base3 comparsion}
+compare(sqldf_3(Posts, Users, Comments),base_3(Posts, Users, Comments),allowAll = TRUE)
+```
+
+#### 2) SQLDF - DPLYR LIBRARY
+
+```{r sqldf3-dplyr3 comparsion}
+compare(sqldf_3(Posts, Users, Comments),dplyr_3(Posts, Users, Comments),allowAll = TRUE)
+```
+
+#### 3) SQLDF - DATA.TABLE LIBRARY
+
+```{r sqldf3-data.table3 comparsion}
+compare(sqldf_3(Posts, Users, Comments),data.table_3(Posts, Users, Comments),allowAll = TRUE)
+```
+
+### Comparsion of Execution Time
+
+```{r microbenchmark for QUERY3 }
+test_3<-microbenchmark(sqldf_3(Posts, Users, Comments),base_3(Posts, Users, Comments),dplyr_3(Posts, Users, Comments),data.table_3(Posts, Users, Comments),times = 40,unit = "s")
+print(test_3)
+plotbench(test_3)
+```
+
+## QUERY 4
+
+the overall intention of the query is to identify and display information about users who have posted more answers than questions, and to show additional details about these users such as display name, location, reputation, and vote counts. The final result is limited to the top 5 users based on the number of answers they have posted.
+
+### Equivalence Comparisons
+
+#### 1) SQLDF - BASE FUNCTIONS
+
+```{r sqldf4-base4 comparsion}
+compare(sqldf_4(Posts, Users),base_4(Posts, Users),allowAll = TRUE)
+```
+
+#### 2) SQLDF - DPLYR LIBRARY
+
+```{r sqldf4-dplyr4 comparsion}
+compare(sqldf_4(Posts, Users),dplyr_4(Posts, Users),allowAll = TRUE)
+```
+
+#### 3) SQLDF - DATA.TABLE LIBRARY
+
+```{r sqldf4-data.table4 comparsion}
+compare(sqldf_4(Posts, Users),data.table_4(Posts, Users),allowAll = TRUE)
+```
+
+### Comparsion of Execution Time
+
+```{r microbenchmark for QUERY4 }
+test_4<-microbenchmark(sqldf_4(Posts, Users),base_4(Posts, Users),dplyr_4(Posts, Users),data.table_4(Posts, Users),times = 40,unit = "s")
+print(test_4)
+plotbench(test_4)
+```
+
+## QUERY 5
+
+The overall intention of the query is to identify and display information about questions and their best answers where the difference between the maximum score of the best answer and the score of the accepted answer is greater than 50. The result is ordered by this difference in descending order.
+
+### Equivalence Comparisons
+
+#### 1) SQLDF - BASE FUNCTIONS
+
+```{r sqldf5-base5 comparsion}
+#compare(sqldf_5(Posts),base_5(Posts),allowAll = TRUE)
+#I did not manage to write it by base functions. I believe the most of the code is correctly done in base5.
+```
+
+#### 2) SQLDF - DPLYR LIBRARYK
+
+```{r sqldf5-dplyr5 comparsion}
+compare(sqldf_5(Posts),dplyr_5(Posts),allowAll = TRUE)
+```
+
+#### 3) SQLDF - DATA.TABLE LIBRARY
+
+```{r sqldf5-data.table5 comparsion}
+compare(sqldf_5(Posts),data.table_5(Posts),allowAll = TRUE)
+```
+
+### Comparsion of Execution Time
+
+```{r microbenchmark for QUERY5 }
+test_5<-microbenchmark(sqldf_5(Posts),dplyr_5(Posts),data.table_5(Posts),times = 40,unit = "s")
+print(test_5)
+
+```
+
+
+## Conclusion
+
+In my opinion the best library to use was the DPLYR. First of all it is much more human-readable (due to natural function names) than the other libraries so that when I make a mistake it was way easier to detect my mistake however
+in for example data.table library you need to be careful for punctuation and paranthesis.
+Furthermore, thanks to pipe operator you do not have to create many variables thus you prevent the confusion due to it.In data.table we are also allow to write the commands in a row without creating new variable but dplyr was easier to adapt for me. 
+The last benefit of it for me was the name of the functions belong to DPLYR library resonates me as if I am writing it on a programming language such as python,c#,java.
